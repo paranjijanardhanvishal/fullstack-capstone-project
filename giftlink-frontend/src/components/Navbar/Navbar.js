@@ -10,11 +10,10 @@ export default function Navbar() {
 
             <div className="collapse navbar-collapse" id="navbarNav">
                 <ul className="navbar-nav">
-
                     <li className="nav-item">
-                        <Link className="nav-link" to="/home.html">
+                        <a className="nav-link" href="/home.html">
                             Home
-                        </Link>
+                        </a>
                     </li>
 
                     <li className="nav-item">
@@ -29,6 +28,17 @@ export default function Navbar() {
                         </Link>
                     </li>
 
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/app/login">
+                            Login
+                        </Link>
+                    </li>
+
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/app/register">
+                            Register
+                        </Link>
+                    </li>
                 </ul>
             </div>
         </nav>
