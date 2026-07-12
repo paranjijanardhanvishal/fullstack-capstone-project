@@ -124,4 +124,75 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// ================= UPDATE USER =================
+
+router.put(
+    '/update',
+    [
+        body('name').notEmpty().withMessage('Name is required')
+    ],
+    async (req, res) => {
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            logger.error(errors.array());
+            return res.status(400).json({
+                errors: errors.array()
+            });
+        }
+
+        try {
+
+            const email = req.headers.email;
+
+            if (!email) {
+                return res.status(400).json({
+                    error: 'Email not found in the request headers'
+                });
+            }
+
+            const db = await connectToDatabase();
+            const collection = db.collection('users');
+
+            const existingUser = await collection.findOne({
+                email
+            });
+
+            if (!existingUser) {
+                return res.status(404).json({
+                    error: 'User not found'
+                });
+            }
+
+            existingUser.firstName = req.body.name;
+            existingUser.updatedAt = new Date();
+
+            const updatedUser = await collection.findOneAndUpdate(
+                { email },
+                { $set: existingUser },
+                { returnDocument: 'after' }
+            );
+
+            const payload = {
+                user: {
+                    id: existingUser._id.toString()
+                }
+            };
+
+            const authtoken = jwt.sign(payload, JWT_SECRET);
+
+            logger.info('User updated successfully');
+
+            res.json({
+                authtoken
+            });
+
+        } catch (error) {
+            logger.error(error);
+            return res.status(500).send('Internal Server Error');
+        }
+    }
+);
+
 module.exports = router;
